@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>English Tense Quiz - Set 3</title>
+  <style>
+    body {
+      background-color: #f0f8ff;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .quiz-container {
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 30px;
+      background: #fff;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #34495e;
+    }
+
+    .question-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    .question {
+      font-size: 1.3em;
+      margin-bottom: 20px;
+    }
+
+    .options {
+      list-style: none;
+      padding: 0;
+    }
+
+    .options li {
+      padding: 12px;
+      margin-bottom: 10px;
+      background: #f2f2f2;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .options li:hover {
+      background: #ddd;
+    }
+
+    .correct {
+      background-color: #2ecc71 !important;
+      color: white;
+    }
+
+    .incorrect {
+      background-color: #e74c3c !important;
+      color: white;
+    }
+
+    .feedback, .explanation {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .feedback img {
+      width: 200px;
+      margin-top: 10px;
+    }
+
+    #nextBtn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #2980b9;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .music-toggle {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .music-toggle button {
+      padding: 10px;
+      border: none;
+      background: #8e44ad;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .score {
+      text-align: right;
+      font-size: 1em;
+      color: #555;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="quiz-container">
+  <h1>English Tense Quiz - Set 3</h1>
+  <div class="question-info">
+    <div id="qNumber">Question 1 of 10</div>
+    <div class="score">Score: <span id="score">0</span></div>
+  </div>
+  <div class="question" id="questionText"></div>
+  <ul class="options" id="optionsList"></ul>
+  <div class="feedback" id="feedback"></div>
+  <div class="explanation" id="explanation"></div>
+  <button id="nextBtn" style="display: none;">Next</button>
+  <div class="music-toggle">
+    <button onclick="toggleMusic()">Toggle Music</button>
+  </div>
+</div>
+
+<audio id="correctSound" src="https://www.soundjay.com/button/sounds/button-4.mp3"></audio>
+<audio id="wrongSound" src="https://www.soundjay.com/button/sounds/button-10.mp3"></audio>
+<audio id="bgMusic" loop autoplay>
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+const questions = [
+  {
+    question: "He ___ already eaten before we arrived.",
+    options: ["has", "had", "was", "is"],
+    answer: 1,
+    explanation: "Past perfect 'had eaten' is used to show he finished eating before another past action."
+  },
+  {
+    question: "I ___ to call you yesterday, but I forgot.",
+    options: ["am trying", "tried", "was trying", "have tried"],
+    answer: 2,
+    explanation: "'Was trying' (past continuous) shows an attempt that was in progress at a past time."
+  },
+  {
+    question: "She ___ a song when I entered the room.",
+    options: ["sings", "was singing", "sang", "had sung"],
+    answer: 1,
+    explanation: "Past continuous 'was singing' describes the ongoing action at the moment I entered."
+  },
+  {
+    question: "If you ___ earlier, you wouldn't have missed the train.",
+    options: ["had left", "leave", "left", "have left"],
+    answer: 0,
+    explanation: "In third conditional, 'had left' is used to describe unreal past events."
+  },
+  {
+    question: "They ___ at the airport for over an hour now.",
+    options: ["wait", "are waiting", "have been waiting", "had waited"],
+    answer: 2,
+    explanation: "'Have been waiting' is present perfect continuous used for an action that started in the past and continues now."
+  },
+  {
+    question: "By the time we get there, the movie ___.",
+    options: ["starts", "will start", "will have started", "started"],
+    answer: 2,
+    explanation: "Future perfect 'will have started' refers to an action completed before another future moment."
+  },
+  {
+    question: "He ___ to the gym every day.",
+    options: ["go", "goes", "gone", "going"],
+    answer: 1,
+    explanation: "'Goes' is present simple used for habitual actions."
+  },
+  {
+    question: "She ___ TV when I last saw her.",
+    options: ["was watching", "watched", "watches", "watching"],
+    answer: 0,
+    explanation: "Past continuous 'was watching' indicates an action that was happening at that time."
+  },
+  {
+    question: "We ___ this movie three times already.",
+    options: ["saw", "have seen", "see", "had seen"],
+    answer: 1,
+    explanation: "'Have seen' is present perfect, showing an experience that happened multiple times up to now."
+  },
+  {
+    question: "He usually ___ coffee in the morning.",
+    options: ["drink", "drank", "drinks", "is drinking"],
+    answer: 2,
+    explanation: "'Drinks' is present simple for daily routines or general truths."
+  }
+];
+
+let current = 0;
+let score = 0;
+let canClick = true;
+
+function renderQuestion() {
+  const q = questions[current];
+  document.getElementById("qNumber").textContent = `Question ${current + 1} of ${questions.length}`;
+  document.getElementById("questionText").textContent = q.question;
+  document.getElementById("feedback").innerHTML = '';
+  document.getElementById("explanation").innerHTML = '';
+  document.getElementById("nextBtn").style.display = 'none';
+
+  const optionsList = document.getElementById("optionsList");
+  optionsList.innerHTML = '';
+
+  q.options.forEach((opt, index) => {
+    const li = document.createElement("li");
+    li.textContent = opt;
+    li.onclick = () => {
+      if (!canClick) return;
+      canClick = false;
+      const isCorrect = index === q.answer;
+
+      if (isCorrect) {
+        li.classList.add("correct");
+        document.getElementById("feedback").innerHTML = '✅ Correct!<br><img src="https://media.giphy.com/media/111ebonMs90YLu/giphy.gif">';
+        document.getElementById("correctSound").play();
+        score++;
+      } else {
+        li.classList.add("incorrect");
+        document.getElementById("feedback").innerHTML = '❌ Wrong!<br><img src="https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif">';
+        document.getElementById("wrongSound").play();
+      }
+
+      document.getElementById("score").textContent = score;
+
+      Array.from(optionsList.children).forEach((liElem, idx) => {
+        if (idx === q.answer) liElem.classList.add("correct");
+        liElem.style.pointerEvents = "none";
+      });
+
+      document.getElementById("explanation").textContent = q.explanation;
+      document.getElementById("nextBtn").style.display = "inline-block";
+    };
+    optionsList.appendChild(li);
+  });
+}
+
+document.getElementById("nextBtn").onclick = () => {
+  current++;
+  canClick = true;
+  if (current < questions.length) {
+    renderQuestion();
+  } else {
+    document.querySelector(".quiz-container").innerHTML = `
+      <h1>Quiz Completed!</h1>
+      <p>🎉 Well done! You've finished Set 3.</p>
+      <p>Your final score: <strong>${score} / ${questions.length}</strong></p>
+    `;
+  }
+};
+
+function toggleMusic() {
+  const music = document.getElementById("bgMusic");
+  music.paused ? music.play() : music.pause();
+}
+
+renderQuestion();
+</script>
+</body>
+</html>
